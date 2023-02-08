@@ -1,12 +1,13 @@
 ### Install ADDS and create a domain
-$domain = "erik.local"
-Add-WindowsFeature AD-Domain-Services
-Install-ADDSForest -DomainName $dom -InstallDNS
+#$domain = "erik.local"
+#Add-WindowsFeature AD-Domain-Services
+#Install-ADDSForest -DomainName $dom -InstallDNS
 ### Making A Records
 Add-DnsServerResourceRecordA -Name "xubuntu-wan" -ZoneName "erik.local" -AllowUpdateAny -IPv4Address "10.0.17.100"
 Add-DnsServerResourceRecordA -Name "480-fw" -ZoneName "erik.local" -AllowUpdateAny -IPv4Address "10.0.17.2"
 Add-DnsServerResourceRecordA -Name "vcenter" -ZoneName "erik.local" -AllowUpdateAny -IPv4Address "10.0.17.3"
 ### Create Reverse Lookup Zone
+Add-DnsServerPrimaryZone -NetworkID "10.0.17.0/24" -ReplicationScope "Domain"
 ### Making PTR Records
 Add-DnsServerResourceRecordPtr -Name "100" -ZoneName "0.17.10.in-addr.arpa" -AllowUpdateAny -PtrDomainName "xubuntu-wan.erik.local"
 Add-DnsServerResourceRecordPtr -Name "2" -ZoneName "0.17.10.in-addr.arpa" -AllowUpdateAny -PtrDomainName "480-fw.erik.local"
