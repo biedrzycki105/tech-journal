@@ -1,7 +1,6 @@
 ### Install ADDS and create a domain
-$domain = "erik.local"
 Add-WindowsFeature AD-Domain-Services
-Install-ADDSForest -DomainName $domain -InstallDNS
+Install-ADDSForest -DomainName erik.local -InstallDNS
 ### Making A Records
 Add-DnsServerResourceRecordA -Name "xubuntu-wan" -ZoneName "erik.local" -AllowUpdateAny -IPv4Address "10.0.17.100"
 Add-DnsServerResourceRecordA -Name "480-fw" -ZoneName "erik.local" -AllowUpdateAny -IPv4Address "10.0.17.2"
