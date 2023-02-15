@@ -27,7 +27,7 @@ $vmhost = Get-VMHost -Name "192.168.7.37"
 
 ### Creates Linked Clone
 $linkedClone = "{0}.linked" -f $vm.name
-$linkedvm = New-VM -LinkedClone -Name $linkedClone -VM -ReferenceSnapshot $snapshot -VMHost $vmhost -Datastore $datastore
+$linkedvm = New-VM -LinkedClone -Name $linkedClone -VM $vm -ReferenceSnapshot $snapshot -VMHost $vmhost -Datastore $datastore
 
 ### Creates New VM from Linked Clone
 $newvm = New-VM -Name "server.2019.gui.base" -VM $linkedvm -VMHost $vmhost -Datastore $datastore
