@@ -31,3 +31,4 @@ $linkedvm = New-VM -LinkedClone -Name $linkedClone -VM $vm -ReferenceSnapshot $s
 
 ### Creates New VM from Linked Clone
 $newvm = New-VM -Name "server.2019.gui.base" -VM $linkedvm -VMHost $vmhost -Datastore $datastore
+$newvm | New-Snapshot -Name "base"
