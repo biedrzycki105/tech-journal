@@ -16,7 +16,7 @@ foreach($vmChoice in $allVMs)
 }
 
 ### Asks for VM that needs to be cloned
-$vmname = Read-Host "What VM do you want to clone? Please type full VM name as listed (i.e. xubuntu-wan)"
+$vmname = Read-Host "What VM do you want to clone? Make sure VM is turned off! Please type full VM name as listed (i.e. xubuntu-wan)"
 $vm = Get-VM -Name $vmname
 
 ### Grabs snapshot from VM
