@@ -31,6 +31,7 @@ $linkedClone = "{0}.linked" -f $vm.name
 $linkedvm = New-VM -LinkedClone -Name $linkedClone -VM $vm -ReferenceSnapshot $snapshot -VMHost $vmhost -Datastore $datastore -Location "LINKED_VMS"
 
 ### Creates New VM from Linked Clone and takes snapshot
+$newvmname = Read-Host "What would you like your new Base VM to be named?"
 $newvm = New-VM -Name $newvmname -VM $linkedvm -VMHost $vmhost -Datastore $datastore
 $newvm | New-Snapshot -Name "base"
 
