@@ -1,4 +1,4 @@
-### Erik Biedrzycki | Clone From Production
+### Erik Biedrzycki | Clone From Base
 
 ### Connect to vCenter
 $vcenter = "vcenter.erik.local"
