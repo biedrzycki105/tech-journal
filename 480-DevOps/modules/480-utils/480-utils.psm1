@@ -10,3 +10,23 @@ function 480Banner()
 "@
     Write-Host $banner 
 }
+
+function ListFolders()
+{
+
+}
+
+function ListVMs()
+{
+
+}
+
+function DeployLinkedClone()
+{
+
+}
+
+function DeployFullClone()
+{
+    
+}
