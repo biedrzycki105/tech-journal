@@ -1,10 +1,11 @@
 {
     "vcenter_server":"vcenter.erik.local", 
+    "datacenter":"480-DevOps",
     "datastore":"datastore1-super27",
     "esxi_host":"192.168.7.37", 
     "snapshot_name":"base", 
     "network":"480-WAN", 
-    "linked_folder":"LINKED-VMS", 
-    "base_folder":"BASE-VMS", 
+    "linked_folder":"LINKED_VMS", 
+    "base_folder":"BASE_VMS", 
     "prod_folder":"PROD"
 }
