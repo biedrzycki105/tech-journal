@@ -11,9 +11,9 @@ function 480Banner()
     Write-Host $banner 
 }
 
-function Get-480Config([string] $config_path)
+function Get-480Config([string] $configPath)
 {
-    $conf = (Get-Content -Raw -Path $config_path | ConvertFrom-Json)
+    $conf = (Get-Content -Raw -Path $configPath | ConvertFrom-Json)
     return $conf
 }
 
@@ -53,7 +53,7 @@ function Select-VM()
 
 function Deploy-LinkedClone()
 {
-    Get-480Config -config_path "/home/xubuntu-wan/Documents/GitHub/tech-journal/480-DevOps/configs/480.json"
+    Get-480Config -configPath "/home/xubuntu-wan/Documents/GitHub/tech-journal/480-DevOps/configs/480.json"
     $vm_selected = Select-VM
 
     ### Grabs snapshot from VM
@@ -71,7 +71,7 @@ function Deploy-LinkedClone()
 
 function Deploy-FullClone()
 {
-    Get-480Config -config_path "/home/xubuntu-wan/Documents/GitHub/tech-journal/480-DevOps/configs/480.json"
+    Get-480Config -configPath "/home/xubuntu-wan/Documents/GitHub/tech-journal/480-DevOps/configs/480.json"
     $vm_selected = Select-VM
     $snapshot = Get-Snapshot -VM $vm_selected -Name $conf.snapshot_name
     $vmhost = Get-VMHost -Name $conf.esxi_host
@@ -85,4 +85,43 @@ function Deploy-FullClone()
     
     ### Removes Linked VM (vm.linked)
     $linkedvm | Remove-VM
+}
+
+function New-Network([string] $NetworkName, [string] $Server, [string] $VMHost)
+{
+    New-VirtualSwitch -Name $NetworkName -Server $Server -VMHost $VMHost
+    Get-VMHost -Name $VMHost | Get-VirtualSwitch -Name $NetworkName | New-VirtualPortGroup -Name $NetworkName
+}
+
+function Get-IP([string] $VMName, [string] $VMHost)
+{
+    $VMIP = @((Get-VMGuest -VM (Get-VM -name $VMName)).IPAddress)
+    $VMMac = @(Get-VM $VMName | Get-NetworkAdapter | select -ExpandProperty MacAddress)
+    #$addrs = @((Get-VMGuest -VM (Get-VM -name $VMName)).IPAddress)
+    Write-Host "Name:" $VMName `n "IP:" $VMIP[0] `n "MAC:" $VMMac[0]
+}
+
+function Start-VMs ([string] $VMName)
+{
+    Get-480Config -configPath "/home/xubuntu-wan/Documents/GitHub/tech-journal/480-DevOps/configs/480.json"
+    $vms = @($VMName)
+    foreach($vm in $vms)
+    {
+        $target = Get-VM -Name $vm -Server $vcenter_server
+        Start-VM -VM $target
+    }
+}
+
+function Set-Network([string] $VMName, [string] $location)
+{
+    Get-480Config -configPath "/home/xubuntu-wan/Documents/GitHub/tech-journal/480-DevOps/configs/480.json"
+    $folder = Get-Folder -Name $location -Server $vcenter_server
+    $vm = Get-VM -Name $VMName -Location $folder  
+    $networkAdapters = @(Get-NetworkAdapter -VM $vm)
+    $i = 0
+    foreach($networkAdapter in $networkAdapters)
+    {
+        Write-Host [$i] $networkAdapter
+        $i++
+    }
 }
