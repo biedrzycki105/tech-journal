@@ -10,7 +10,7 @@ Install-ADDSForest -DomainName erik.local -InstallDNS
 
 ### Create Reverse Lookup Zone
 
-#Add-DnsServerPrimaryZone -NetworkID "10.0.17.0/24" -ReplicationScope "Domain"
+Add-DnsServerPrimaryZone -NetworkID "10.0.5.0/24" -ReplicationScope "Domain"
 
 ### Making PTR Records
 
