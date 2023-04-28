@@ -31,14 +31,21 @@ function Select-Folder()
         Write-Host [$i] $folder
         $i++
     }
-    $folderChoice = Read-Host "What folder do you want to clone from? Please type the index number only"
+    $folderChoice = Read-Host "Select a folder. Please type the index number only"
     $folder_selected = $folders[$folderChoice]
     return $folder_selected
 }
 
-function Select-VM()
+function Select-VM([string]$Folder)
 {
-    $folder_selected = Select-Folder
+    if($Folder)
+    {
+        $folder_selected = Get-Folder -Name $Folder -Type VM
+    } else {
+        $folder_selected = Select-Folder
+    }
+    
+    
     $vms = @(Get-VM -Location $folder_selected)
     $i = 0
     foreach($vm in $vms)
@@ -51,10 +58,28 @@ function Select-VM()
     return $vm_selected
 }
 
-function Deploy-LinkedClone()
+function Deploy-LinkedClone([string]$VM, [string]$CloneName, [string]$Folder)
 {
-    Get-480Config -configPath "/home/xubuntu-wan/Documents/GitHub/tech-journal/480-DevOps/configs/480.json"
-    $vm_selected = Select-VM
+    Get-480Config -configPath "~/Documents/GitHub/tech-journal/480-DevOps/configs/480.json"
+   
+   if ($Folder)
+   {
+        Get-Folder -Name $Folder -Type VM
+   } else {
+        Write-Host "You did not choose a destination for your clone!"
+        $Folder = Select-Folder
+   }
+   
+    if ($VM)
+   {
+        $vm_selected = Get-VM -Name $VM
+   } else {
+        $vm_selected = Select-VM
+   }
+
+   if ($CloneName -eq $null){
+    $CloneName = Read-Host "What will the new VM be called?"
+   }
 
     ### Grabs snapshot from VM
     $snapshot = Get-Snapshot -VM $vm_selected -Name $conf.snapshot_name
@@ -63,15 +88,15 @@ function Deploy-LinkedClone()
     $vmhost = Get-VMHost -Name $conf.esxi_host
 
     ### Creates Linked Clone
-    $linkedClone = Read-Host "What will the new VM be called?"
-    $linkedvm = New-VM -LinkedClone -Name $linkedClone -VM $vm_selected -ReferenceSnapshot $snapshot -VMHost $vmhost -Datastore $conf.datastore -Location $conf.linked_folder
+    
+    $linkedvm = New-VM -LinkedClone -Name $CloneName -VM $vm_selected -ReferenceSnapshot $snapshot -VMHost $vmhost -Datastore $conf.datastore -Location $Folder
     $linkedvm | New-Snapshot -Name $conf.snapshot_name
     $linkedvm | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName $conf.network
 }
 
 function Deploy-FullClone()
 {
-    Get-480Config -configPath "/home/xubuntu-wan/Documents/GitHub/tech-journal/480-DevOps/configs/480.json"
+    Get-480Config -configPath "~/Documents/GitHub/tech-journal/480-DevOps/configs/480.json"
     $vm_selected = Select-VM
     $snapshot = Get-Snapshot -VM $vm_selected -Name $conf.snapshot_name
     $vmhost = Get-VMHost -Name $conf.esxi_host
@@ -103,18 +128,13 @@ function Get-IP([string] $VMName, [string] $VMHost)
 
 function Start-VMs ([string] $VMName)
 {
-    Get-480Config -configPath "/home/xubuntu-wan/Documents/GitHub/tech-journal/480-DevOps/configs/480.json"
-    $vms = @($VMName)
-    foreach($vm in $vms)
-    {
-        $target = Get-VM -Name $vm -Server $vcenter_server
-        Start-VM -VM $target
-    }
+    Get-480Config -configPath "~/Documents/GitHub/tech-journal/480-DevOps/configs/480.json"
+    $target = Get-VM -Name $VMName -Server $vcenter_server
+    Start-VM -VM $target
 }
-
 function Set-Network([string] $VMName, [string] $location)
 {
-    Get-480Config -configPath "/home/xubuntu-wan/Documents/GitHub/tech-journal/480-DevOps/configs/480.json"
+    Get-480Config -configPath "~/Documents/GitHub/tech-journal/480-DevOps/configs/480.json"
     $folder = Get-Folder -Name $location -Server $vcenter_server
     $vm = Get-VM -Name $VMName -Location $folder  
     $networkAdapters = @(Get-NetworkAdapter -VM $vm)
@@ -124,4 +144,28 @@ function Set-Network([string] $VMName, [string] $location)
         Write-Host [$i] $networkAdapter
         $i++
     }
+    $adapterChoice = Read-Host "What network adapter do you want to configure? Please type the index number only"
+    $adapter_selected = $networkAdapters[$adapterChoice]
+
+    $networks = @(Get-VirtualSwitch -Server $conf.vcenter_server)
+    $i = 0
+    foreach($network in $networks)
+    {
+        Write-Host [$i] $network
+        $i++
+    }
+    $networkChoice = Read-Host "What network do you want to assign to the chosen adapter? Please type the index number only"
+    $network_selected = $networks[$networkChoice]
+    
+    Set-NetworkAdapter -NetworkAdapter $adapter_selected -NetworkName $network_selected.Name
+}
+function Edit-VM([string] $VMName, [string] $CPU, [string] $MemGB)
+{
+    $vm = Get-VM -Name $VMName
+    Set-VM -VM $vm -NumCpu $CPU -MemoryGB $MemGB
+}
+
+function Set-WindowsIP([string] $VMName, [string] $NewIP)
+{
+    $script = ""
 }
