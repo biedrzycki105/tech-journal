@@ -6,24 +6,15 @@ linux:
         10.0.5.10:
           hostname: rocky1
           lan_ip: 10.0.5.10
-        10.0.5.11:
-          hostname: rocky2
-          lan_ip: 10.0.5.11
-        10.0.5.12:
-          hostname: rocky3
-          lan_ip: 10.0.5.12
       vars:
         device: ens33
     ubuntu:
       hosts:
-        10.0.5.102:
+        10.0.5.35:
           hostname: ubuntu1
           lan_ip: 10.0.5.30
-        10.0.5.103:
-          hostname: ubuntu2
-          lan_ip: 10.0.5.31
       vars:
-        device: ens34
+        device: ens33
     
   vars: 
     public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCog5eU3+mYsdJ1i0UmdH2OYmmij2hgn3yvRJe81Y40XbK/sPlEJBT/54AHIaX/JnIAHDQbCPMWp3+dG8+5GozwvSoF66R1Lceg7yhb9QXT7lqK2mDizA4O1qkCDVS44Dm8ipv8BzqUSW7AEHEB4FNSht2delrLuOF45lBbHUmhWw4C/zcChEPHz5m+acloci41QrhLd9qA7Z2CE4L8DXkkMU6aGrLSy+EnDHNyQEIn1EZqgs6tqElFW5sUV2Vmlz5MD6swakCwN4yW9M4+5RMoZhpgufAe/0pYKHq/qEJhDycUcjC9F7VCtDlQyXOTxSttAW/qwm/QUhjcQkLdLjyad4WR/WdZ1u0Mg3LppVjolq8UNWzMiN48r+QFPdbj6pBs4T0X9sszlpSnUSoao0V/fUT4KXkD20PEtnxVEbxes2aiuPYt3MgiXSonTAGo0vkkVXXMzz8RzDAXWBxiP3nqfvX+42iHlyOVr51TZ3yYdfwPzUMchU8bRseZ1qoCv1E= xubuntu-wan@xubuntu-wan"
@@ -32,6 +23,7 @@ linux:
     domain: blue1.local
     gateway: 10.0.5.2
     name_server: 10.0.5.5
+
     
     
         
