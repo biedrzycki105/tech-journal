@@ -1,0 +1,11 @@
+network:
+  ethernets:
+    ens33:
+      addresses:
+        - {{ lan_ip }}/24
+      dhcp4: false
+      nameservers:
+        addresses:
+          - {{ name_server }}
+      gateway4: {{ gateway }}
+  version: 2

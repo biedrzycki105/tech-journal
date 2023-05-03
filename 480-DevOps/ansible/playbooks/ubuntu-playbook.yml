@@ -1,0 +1,58 @@
+# ansible-playbook -i inventories/linux.yml --user root --ask-pass ubuntu-playbook.yml -K
+
+- name: ubuntu config
+  hosts: ubuntu
+  tasks:
+    - name: create .ssh directory if not already present
+      file:
+        path: "/home/{{ ansible_user }}/.ssh"
+        state: directory
+        mode: 0700
+    - name: create authorized keys file
+      file:
+        path: "/home/{{ ansible_user }}/.ssh/authorized_users"
+        state: touch
+        mode: 0644
+    - name: copy over public key
+      blockinfile:
+        dest: "/home/{{ ansible_user }}/.ssh/authorized_users"
+        block: "{{ public_key }}"
+    
+    - name: create drop-in file
+      file:
+        path: /etc/sudoers.d/480
+        state: touch
+        mode: 0440
+      become: yes
+
+    - name: create drop-in entry for /etc/sudoers.d/480
+      blockinfile:
+        dest: "/etc/sudoers.d/480"
+        block: "{{ ansible_user }}   ALL=(ALL)  NOPASSWD: ALL"
+      become: yes 
+
+    - name: set hostname
+      hostname:
+        name: "{{ hostname }}"
+      become: yes
+
+    - name: add local host to /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        line: '127.0.1.1   {{ hostname }}'
+      become: yes
+      
+    - name: load netplan config from template
+      become: yes
+      template:
+        src: ./files/00-installer-config.yaml
+        dest: /etc/netplan/00-installer-config.yaml
+        mode: 0440
+        owner: root
+        group: root
+    
+    - name: bounce the box
+      shell: "sleep 5 && shutdown -r"
+      become: yes
+      async: 1
+      poll: 0
