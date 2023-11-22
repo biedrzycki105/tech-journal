@@ -1,0 +1,49 @@
+---
+- name: Wireguard Server Setup
+  hosts: vpn_server
+  vars:
+    server_privkey: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          30646332326431313536646466636538353131376238343339333463633564343763393431636232
+          6662333334333761373463393938306364383266643366380a343861313561306234313463396463
+          63363035366436363330353336393930353264633663343830623338323662363835343431353663
+          3561623261363363660a363163613566376462333633383236356335366365653339613238303431
+          36626131323536323435376532376131303461643335363439616434653964623931306335646663
+          3630626431333534653864393439303431623462636234376531
+    server_pubkey: 78FlfZRlXcZy7NUZjuUeyZE+i8Z5awwZycxE3RvTc34= 
+  tasks: 
+      # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_module.html
+  - name: install wireguard package
+    apt:
+      package: wireguard
+      state: present
+      update_cache: yes
+    become: yes
+
+  # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html
+  - name: create server wireguard config
+    template:
+      dest: /etc/wireguard/wg0.conf
+      src: server_wg0.conf.j2
+      owner: root
+      group: root
+      mode: '0600'
+    become: yes
+
+  # https://docs.ansible.com/ansible/latest/collections/ansible/posix/sysctl_module.html
+  - name: enable and persist ip forwarding
+    sysctl:
+      name: net.ipv4.ip_forward
+      value: "1"
+      state: present
+      sysctl_set: yes
+      reload: yes
+    become: yes
+
+  # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/systemd_module.html
+  - name: start wireguard and enable on boot
+    systemd:
+      name: wg-quick@wg0
+      enabled: yes
+      state: started
+    become: yes

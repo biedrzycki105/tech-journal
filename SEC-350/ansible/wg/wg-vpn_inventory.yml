@@ -1,0 +1,15 @@
+vpn_server:
+  hosts:
+    172.16.50.4:
+linux_peers:
+  hosts:
+windows_peers:
+  hosts:
+vyos:
+  hosts:
+    172.16.50.2:
+
+  vars:
+    ansible_user: erik
+    ansible_method: ssh
+ 
